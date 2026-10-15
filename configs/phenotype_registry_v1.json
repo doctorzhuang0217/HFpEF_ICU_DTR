@@ -1,0 +1,108 @@
+{
+  "version": "v1",
+  "created": "2026-03-09 01:10:07",
+  "protocol": "v3.1",
+  "database": "mimic",
+  "labels": {
+    "rule_phenotype_4class": {
+      "role": "primary",
+      "source_step": "60d",
+      "description": "Rule-based 4-class: shock_dominant, congestion_dominant, mixed, neither",
+      "used_in_step_c": true,
+      "n_classes": 4
+    },
+    "rule_phenotype_2class": {
+      "role": "primary",
+      "source_step": "60d",
+      "description": "Rule-based 2-class: shock_predominant vs non_shock",
+      "used_in_step_c": true,
+      "n_classes": 2
+    },
+    "early_data_driven_k2": {
+      "role": "sensitivity",
+      "source_step": "60b",
+      "description": "Data-driven K=2 early clusters (stable, ARI=0.986)",
+      "used_in_step_c": true,
+      "n_classes": 2,
+      "note": "Primary K=3 failed stability (ARI_P5=0.164); K=2 used as sensitivity"
+    },
+    "early_data_driven_k3_ref": {
+      "role": "reference_only",
+      "source_step": "60b",
+      "description": "Data-driven K=3 (60b selected, failed stability 60c)",
+      "used_in_step_c": false,
+      "n_classes": 3,
+      "note": "Reference only \u2014 do NOT use for stratification"
+    },
+    "trajectory_data_driven_k2": {
+      "role": "explanatory",
+      "source_step": "65b",
+      "description": "Data-driven trajectory K=2 clusters",
+      "used_in_step_c": false,
+      "n_classes": 2,
+      "note": "Explanatory only (Aim 3) \u2014 does NOT feed primary estimand"
+    },
+    "trajectory_gmvae": {
+      "role": "explanatory",
+      "source_step": "65b",
+      "description": "GMVAE trajectory clusters (2 components)",
+      "used_in_step_c": false,
+      "n_classes": 2,
+      "note": "Explanatory only (Aim 3)"
+    }
+  },
+  "early_stability": [
+    {
+      "K": 2,
+      "ari_mean": 0.9863,
+      "ari_std": 0.0052,
+      "ari_p5": 0.9752,
+      "nmi_mean": 0.9684,
+      "nmi_std": 0.0093,
+      "nmi_p5": 0.9493,
+      "n_bootstrap": 100
+    },
+    {
+      "K": 3,
+      "ari_mean": 0.7781,
+      "ari_std": 0.3357,
+      "ari_p5": 0.1644,
+      "nmi_mean": 0.7927,
+      "nmi_std": 0.2917,
+      "nmi_p5": 0.305,
+      "n_bootstrap": 100
+    },
+    {
+      "K": 4,
+      "ari_mean": 0.9527,
+      "ari_std": 0.1024,
+      "ari_p5": 0.6382,
+      "nmi_mean": 0.95,
+      "nmi_std": 0.0805,
+      "nmi_p5": 0.7043,
+      "n_bootstrap": 100
+    }
+  ],
+  "trajectory_stability": [
+    {
+      "K": 2,
+      "ari_mean": 0.9903,
+      "ari_std": 0.0039,
+      "ari_p5": 0.9839,
+      "nmi_mean": 0.9762,
+      "nmi_std": 0.0081,
+      "nmi_p5": 0.9633,
+      "n_bootstrap": 100
+    },
+    {
+      "K": 3,
+      "ari_mean": 0.9545,
+      "ari_std": 0.0992,
+      "ari_p5": 0.5656,
+      "nmi_mean": 0.9359,
+      "nmi_std": 0.0999,
+      "nmi_p5": 0.5462,
+      "n_bootstrap": 100
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+step: 70c_define_rule_policy_v1
+date: '2026-03-09 02:23:56'
+version: v1
+description: Hemodynamic-guided rule-based treatment policy
+action_encoding: fluid_level * 6 + vaso_level * 2 + diuretic_level
+rules:
+- priority: 1
+  name: shock_plus_hypoperfusion
+  condition: MAP < 65 AND lactate > 2.0
+  action: fluid=high, vaso=high, diuretic=none
+  action_idx: 16
+- priority: 2
+  name: hypotension_only
+  condition: MAP < 65 AND lactate <= 2.0
+  action: fluid=high, vaso=low, diuretic=none
+  action_idx: 14
+- priority: 3
+  name: hypoperfusion_only
+  condition: lactate > 2.0 AND MAP >= 65
+  action: fluid=low_moderate, vaso=low, diuretic=none
+  action_idx: 8
+- priority: 4
+  name: volume_overload_hypoxemia
+  condition: fluid_balance > 3.0L AND SpO2 < 94%
+  action: fluid=none, vaso=none, diuretic=any
+  action_idx: 1
+- priority: 5
+  name: severe_volume_overload
+  condition: fluid_balance > 5.0L
+  action: fluid=none, vaso=none, diuretic=any
+  action_idx: 1
+- priority: 6
+  name: default_maintenance
+  condition: otherwise
+  action: fluid=low_moderate, vaso=none, diuretic=none
+  action_idx: 6
+thresholds:
+  map_hypotension: 65
+  lactate_hypoperfusion: 2.0
+  fluid_balance_overload_L: 3.0
+  fluid_balance_severe_overload_L: 5.0
+  spo2_hypoxemia: 94
+normalization_used:
+  map:
+    mean: 78.6558760119551
+    std: 13.926244225893042
+  lactate:
+    mean: 1.915035017059593
+    std: 1.4080980865858965
+  spo2:
+    mean: 96.5701226570089
+    std: 3.0225215123183804

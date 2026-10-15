@@ -1,0 +1,136 @@
+step: 70g_primary_vs_secondary_model_registry
+date: '2026-03-09 10:17:23'
+protocol_version: v3.1
+lock_status: "LOCKED \u2014 do NOT modify after Step 75 begins"
+models:
+  primary_pair:
+  - id: 75a_dynamic_msm_iptw
+    label: dynamic-MSM / IPTW
+    role: primary_classical
+    ope_methods:
+    - WIS
+    - DR
+    subgroup_analysis: true
+    trimming_grid: true
+    phenotype_stratification:
+    - rule_phenotype_4class
+    - rule_phenotype_2class
+    - early_data_driven_k2
+    coarse2_sensitivity: true
+  - id: 80c_gtransformer
+    label: G-Transformer
+    role: primary_deep
+    ope_methods:
+    - DR
+    - FQE
+    - DM
+    subgroup_analysis: true
+    trimming_grid: true
+    phenotype_stratification:
+    - rule_phenotype_4class
+    - rule_phenotype_2class
+    - early_data_driven_k2
+    coarse2_sensitivity: true
+  confirmatory:
+  - id: 80a_gnet
+    label: G-Net
+    role: confirmatory
+    ope_methods:
+    - DR
+    - FQE
+    subgroup_analysis: true
+    trimming_grid: true
+    phenotype_stratification:
+    - rule_phenotype_4class
+    - rule_phenotype_2class
+    coarse2_sensitivity: false
+  - id: 80b_actin
+    label: ACTIN
+    role: confirmatory
+    ope_methods:
+    - DR
+    - FQE
+    subgroup_analysis: true
+    trimming_grid: true
+    phenotype_stratification:
+    - rule_phenotype_4class
+    - rule_phenotype_2class
+    coarse2_sensitivity: false
+  legacy_ablation:
+  - id: 80d_ct_legacy
+    label: Causal Transformer
+    role: legacy_ablation
+    ope_methods:
+    - FQE
+    subgroup_analysis: false
+    trimming_grid: true
+    phenotype_stratification: []
+    coarse2_sensitivity: false
+  optional:
+  - id: 80e_mamba_cdsp
+    label: Mamba-CDSP
+    role: optional
+    ope_methods:
+    - FQE
+    subgroup_analysis: false
+    trimming_grid: false
+    phenotype_stratification: []
+    coarse2_sensitivity: false
+  sensitivity_evaluation:
+  - id: 85a_edq
+    label: EDQ (timing-sensitive OPE)
+    role: sensitivity
+    ope_methods:
+    - method-specific
+    subgroup_analysis: false
+    trimming_grid: false
+    phenotype_stratification: []
+    coarse2_sensitivity: false
+  - id: 85b_seqdeconf
+    label: Sequential Deconfounder (exploratory)
+    role: sensitivity
+    ope_methods:
+    - method-specific
+    subgroup_analysis: false
+    trimming_grid: false
+    phenotype_stratification: []
+    coarse2_sensitivity: false
+  - id: 85j_informative_missingness_sensitivity
+    label: Informative Missingness Sensitivity
+    role: sensitivity
+    ope_methods:
+    - method-specific
+    subgroup_analysis: false
+    trimming_grid: false
+    phenotype_stratification: []
+    coarse2_sensitivity: false
+execution_order:
+  phase_1:
+  - 75a_dynamic_msm_iptw
+  - 80c_gtransformer
+  phase_2:
+  - 80a_gnet
+  - 80b_actin
+  phase_3:
+  - 80d_ct_legacy
+  - 80e_mamba_cdsp
+  phase_4_sensitivity:
+  - 85a_edq
+  - 85b_seqdeconf
+  - 85j_informative_missingness_sensitivity
+interpretation_rules:
+  primary_conclusion: Based on primary pair (75a + 80c). Both must agree for a primary
+    claim. If they disagree, report both and discuss discrepancy.
+  confirmatory: 80a + 80b provide robustness. Directional agreement strengthens conclusion;
+    disagreement flags model sensitivity.
+  legacy_ablation: 80d provides continuity with existing DTR literature. Not used
+    for primary conclusion.
+  sensitivity: 85a-85j test specific assumptions. Flagged results qualify, not invalidate,
+    primary conclusions.
+config_dependencies:
+  70a_policy_objects: present
+  70b_behavior_policy: present
+  70c_rule_policy: present
+  70d_rewards_metrics: present
+  70e_ope_config: present
+  70f_trimming_grid: present

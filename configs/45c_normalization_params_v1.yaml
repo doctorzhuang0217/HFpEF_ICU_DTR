@@ -1,0 +1,120 @@
+step: 45c_build_state_tensors
+date_frozen: '2026-03-08'
+n_active_vars: 22
+dropped_vars:
+- bnp
+- temperature
+active_vars:
+- map
+- sbp
+- dbp
+- heart_rate
+- spo2
+- cvp
+- resp_rate
+- fio2
+- lactate
+- creatinine
+- bun
+- potassium
+- sodium
+- bicarbonate
+- glucose
+- ph
+- hemoglobin
+- wbc
+- platelet
+- albumin
+- bilirubin
+- troponin
+imputation_method: LOCF + population_median
+normalization_method: z-score
+params:
+  map:
+    mean: 78.6558760119551
+    std: 13.926244225893042
+    pop_median: 77.0
+  sbp:
+    mean: 118.10664314016749
+    std: 19.398043015012288
+    pop_median: 116.0
+  dbp:
+    mean: 63.35998429436603
+    std: 13.679740462615754
+    pop_median: 62.0
+  heart_rate:
+    mean: 84.16196618998588
+    std: 17.326300855833964
+    pop_median: 82.5
+  spo2:
+    mean: 96.5701226570089
+    std: 3.0225215123183804
+    pop_median: 97.0
+  cvp:
+    mean: 9.116058389006916
+    std: 2.5108773402893143
+    pop_median: 9.0
+  resp_rate:
+    mean: 19.195774667830356
+    std: 4.932224805627563
+    pop_median: 18.5
+  fio2:
+    mean: 49.6587953105359
+    std: 10.748117130608778
+    pop_median: 50.0
+  lactate:
+    mean: 1.915035017059593
+    std: 1.4080980865858965
+    pop_median: 1.7
+  creatinine:
+    mean: 1.1141223288268642
+    std: 0.8675079626189802
+    pop_median: 0.9
+  bun:
+    mean: 21.258570414646453
+    std: 16.370676383110425
+    pop_median: 17.0
+  potassium:
+    mean: 4.135431257108165
+    std: 0.4920315905126606
+    pop_median: 4.1
+  sodium:
+    mean: 138.29144968061362
+    std: 4.1605791859635035
+    pop_median: 138.0
+  bicarbonate:
+    mean: 22.91124629092806
+    std: 3.512483032967915
+    pop_median: 23.0
+  glucose:
+    mean: 131.7694772595766
+    std: 45.37045841274957
+    pop_median: 123.0
+  ph:
+    mean: 7.376147845531583
+    std: 0.05114151487360025
+    pop_median: 7.38
+  hemoglobin:
+    mean: 10.62386504536398
+    std: 1.6152705368668048
+    pop_median: 10.6
+  wbc:
+    mean: 11.736804746756968
+    std: 6.315672501123614
+    pop_median: 10.9
+  platelet:
+    mean: 188.80254696732595
+    std: 78.62708464302821
+    pop_median: 180.0
+  albumin:
+    mean: 3.0942147028894427
+    std: 0.21441817587069048
+    pop_median: 3.1
+  bilirubin:
+    mean: 1.1088818911777534
+    std: 2.266753566270182
+    pop_median: 0.8
+  troponin:
+    mean: 0.2717679980845369
+    std: 0.8948911349693537
+    pop_median: 0.17

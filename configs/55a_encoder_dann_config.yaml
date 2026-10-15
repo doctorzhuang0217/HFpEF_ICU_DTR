@@ -1,0 +1,124 @@
+# =============================================================================
+# 55a_encoder_dann_config.yaml
+# HFpEF ICU DTR — Domain-adversarial encoder (Step A DANN) hyperparameters
+# Protocol: v3.1 | Step 55a
+# =============================================================================
+
+# ── Model architecture ───────────────────────────────────────────────────────
+# Encoder backbone matches 50a baseline (same BiGRU architecture).
+# Additional domain discriminator for adversarial domain adaptation.
+model:
+  encoder_type: bigru
+  hidden_dim: 128
+  latent_dim: 64
+  n_layers: 2
+  dropout: 0.1
+  use_layer_norm: true
+  static_embed_dim: 32
+  decoder_hidden_dim: 128
+  decoder_n_layers: 1
+
+# ── Self-supervised pretext tasks (same as 50a) ─────────────────────────────
+pretext:
+  masked_reconstruction:
+    enabled: true
+    mask_ratio: 0.15
+    loss_weight: 1.0
+  next_state_prediction:
+    enabled: true
+    loss_weight: 0.5
+    predict_delta: false
+  mortality_head:
+    enabled: false
+    target: mortality_28d
+    loss_weight: 0.1
+
+# ── Domain adversary ────────────────────────────────────────────────────────
+dann:
+  # Number of domains: 2 for MIMIC-only (train domain split),
+  # 3 for MIMIC + eICU + HiRID when available.
+  n_domains: 2
+  domain_hidden_dim: 64
+  domain_n_layers: 2
+  domain_dropout: 0.2
+
+  # Adversarial loss weight: γ in L = L_recon + λ*L_nsp + γ*L_domain
+  # Start low to avoid disrupting early training, ramp up.
+  domain_loss_weight: 0.05
+
+  # Gradient reversal alpha schedule: ramps from 0 → max_alpha
+  # over alpha_warmup_epochs using sigmoid schedule.
+  max_alpha: 1.0
+  alpha_warmup_epochs: 20
+
+  # Warm-start from 50a baseline checkpoint
+  warm_start: true
+  baseline_checkpoint: models/50a_encoder_baseline/encoder_baseline_best.pt
+
+  # Domain labeling strategy when only MIMIC is available:
+  # "split" = use train/val/test as pseudo-domains (sanity check)
+  # "hospital" = use care_unit or similar as domain proxy
+  # "database" = true multi-database labels (requires eICU/HiRID)
+  domain_label_strategy: split
+
+# ── Data ─────────────────────────────────────────────────────────────────────
+data:
+  # Primary (MIMIC)
+  state_tensor_path: data/interim/45c_state_tensors_v1_mimic.parquet
+  outcomes_path: data/interim/45d_outcomes_absorb_v1_mimic.parquet
+
+  # External databases (uncomment when available)
+  # external_sources:
+  #   - name: eicu
+  #     state_tensor_path: data/interim/45c_state_tensors_v1_eicu.parquet
+  #     outcomes_path: data/interim/45d_outcomes_absorb_v1_eicu.parquet
+  #   - name: hirid
+  #     state_tensor_path: data/interim/45c_state_tensors_v1_hirid.parquet
+  #     outcomes_path: data/interim/45d_outcomes_absorb_v1_hirid.parquet
+
+  split_seed: 2024
+  train_frac: 0.7
+  val_frac: 0.15
+  test_frac: 0.15
+  stratify_by: mortality_28d
+  mask_post_absorbing: true
+
+# ── Training ─────────────────────────────────────────────────────────────────
+training:
+  debug:
+    max_epochs: 5
+    batch_size: 256
+    learning_rate: 1.0e-3
+    gradient_clip: 1.0
+    early_stopping_patience: 3
+    num_workers: 4
+
+  full:
+    max_epochs: 120
+    batch_size: 512
+    learning_rate: 1.0e-3
+    weight_decay: 1.0e-5
+    lr_scheduler: cosine_warmup
+    warmup_epochs: 5
+    gradient_clip: 1.0
+    early_stopping_patience: 20
+    num_workers: 8
+
+  # Independent learning rate for domain discriminator
+  domain_lr: 1.0e-3
+  domain_weight_decay: 1.0e-4
+
+  optimizer: adamw
+  mixed_precision: true
+
+# ── Output ───────────────────────────────────────────────────────────────────
+output:
+  checkpoint_dir: models/55a_encoder_dann
+  best_model_name: encoder_dann_best.pt
+  last_model_name: encoder_dann_last.pt
+  training_log: reports/55a_encoder_dann_training_log.csv
+  summary_report: reports/55a_encoder_dann_summary.txt
+
+# ── Reproducibility ──────────────────────────────────────────────────────────
+seed: 42
+deterministic: true

@@ -1,0 +1,44 @@
+name: hfpef-icu-dtr
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - pandas>=2.1
+  - polars>=1.0
+  - pyarrow>=14
+  - duckdb>=1.0
+  - scipy
+  - scikit-learn
+  - statsmodels
+  - pyyaml
+  - tqdm
+  - rich
+  - click
+  - ipython
+  - jupyterlab
+  - ipykernel
+  - matplotlib
+  - openpyxl
+  - pytest
+  - python-dotenv
+  - psutil
+  - tabulate
+  - pip:
+      - pyreadstat
+# ── PyTorch (CUDA-aware) is NOT listed here on purpose. ────────────────
+# The base micromamba recipe would pull a CPU-only conda-forge build, and
+# embedding a `--index-url` in this pip section is unreliable across
+# micromamba versions. After every env (re)build, run:
+#     bash env/install_torch.sh
+# This installs the CUDA-12.1 wheel from the official pytorch index. Verify
+# afterwards with:
+#     env/run_py.sh -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+# (cuda.is_available() is False on the login node — only meaningful on a
+# GPU compute node, but the import succeeding on login is sufficient.)
+#
+# History: G1 qsub jobs began failing 2026-05-10 with ModuleNotFoundError:
+# torch after the 2026-05-09 sibling-parity env rebuild silently dropped
+# the manual pip torch install. This recipe + companion script were added
+# to make the requirement explicit and re-bootstrappable.

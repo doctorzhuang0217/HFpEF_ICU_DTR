@@ -1,0 +1,57 @@
+step: 45a_define_action_space_v1
+date_frozen: '2026-03-08'
+protocol_version: v3.1
+source: configs/29a_candidate_action_schemes.yaml
+primary_scheme: coarse_3
+grid:
+  bin_hours: 2
+  primary_horizon_hours: 24
+  n_bins: 12
+  t0_hours: 6
+ne_equivalent_factors:
+  norepinephrine: 1.0
+  epinephrine: 1.0
+  phenylephrine: 0.1
+  dopamine: 0.01
+  vasopressin: 2.5
+  dobutamine: 0.0
+  milrinone: 0.0
+furo_equivalent_factors:
+  furosemide: 1.0
+  bumetanide: 40.0
+  torsemide: 2.0
+action_dimensions:
+  iv_fluid_ml_per_2h:
+    bins:
+    - 0
+    - 1
+    - 250
+    - inf
+    labels:
+    - none
+    - low_moderate
+    - high
+    n_levels: 3
+  vasopressor_ne_eq_mcg_kg_min:
+    bins:
+    - 0
+    - 0.001
+    - 0.1
+    - inf
+    labels:
+    - none
+    - low
+    - high
+    n_levels: 3
+  diuretic_furo_eq_mg_per_2h:
+    bins:
+    - 0
+    - 0.001
+    - inf
+    labels:
+    - none
+    - any
+    n_levels: 2
+joint_cells: 18
+sensitivity_schemes:
+- medium_4

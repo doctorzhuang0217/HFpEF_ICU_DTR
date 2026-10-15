@@ -1,0 +1,69 @@
+{
+  "version": "v1",
+  "created": "2026-03-08 21:35:23",
+  "protocol": "v3.1",
+  "encoders": {
+    "baseline_mimic_v1": {
+      "checkpoint_path": "models/50a_encoder_baseline/encoder_baseline_best.pt",
+      "sha256": "328afa870874caee9b0b67bdbab9fbf4e97d35d4f9949862047b9c013bda2cb2",
+      "file_size_mb": 7.0,
+      "epoch": 98,
+      "val_loss": 3.560141,
+      "latent_dim": 64,
+      "hidden_dim": 128,
+      "n_layers": 2,
+      "d_temporal": 118,
+      "d_static": 3,
+      "n_temporal_cols": 118,
+      "n_static_cols": 3,
+      "frozen": true,
+      "n_parameters": 579020,
+      "encoder_id": "baseline_mimic_v1",
+      "encoder_type": "BiGRU",
+      "pretext_tasks": [
+        "masked_reconstruction",
+        "next_state_prediction"
+      ],
+      "domain_adaptation": null,
+      "suitable_for": [
+        "phenotyping",
+        "step_c_raw_input",
+        "probe_evaluation"
+      ]
+    },
+    "dann_mimic_v1": {
+      "checkpoint_path": "models/55a_encoder_dann/encoder_dann_best.pt",
+      "sha256": "c6ae67db6611ed397d636c4d77b9b2e8a640a0da000bf0bef9246dff5bca1a99",
+      "file_size_mb": 7.1,
+      "epoch": 117,
+      "val_loss": 2.179905,
+      "latent_dim": 64,
+      "hidden_dim": 128,
+      "n_layers": 2,
+      "d_temporal": 118,
+      "d_static": 3,
+      "n_temporal_cols": 118,
+      "n_static_cols": 3,
+      "frozen": true,
+      "n_parameters": 587535,
+      "encoder_id": "dann_mimic_v1",
+      "encoder_type": "BiGRU + DANN",
+      "pretext_tasks": [
+        "masked_reconstruction",
+        "next_state_prediction"
+      ],
+      "domain_adaptation": {
+        "method": "gradient_reversal",
+        "n_domains": 3,
+        "domain_label_strategy": "split",
+        "domain_loss_weight": 0.05,
+        "val_domain_loss": 0.056414
+      },
+      "suitable_for": [
+        "phenotyping",
+        "step_c_domain_invariant_input",
+        "external_validation"
+      ]
+    }
+  }
+}

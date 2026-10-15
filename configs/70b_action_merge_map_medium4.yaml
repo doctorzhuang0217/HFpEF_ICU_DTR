@@ -1,0 +1,42 @@
+date: '2026-06-03 16:32:02'
+description: Odd action_idx (diuretic=any) merged to even (diuretic=none/any combined)
+  when <0.1% frequency
+merge_map:
+  3: 2
+  5: 4
+  7: 6
+  11: 10
+  13: 12
+  15: 14
+  19: 18
+  23: 22
+  27: 26
+  29: 28
+  31: 30
+n_raw_cells: 32
+rule: 45g_rule_1
+scheme: medium_4
+step: 70b
+threshold: 0.001
+valid_merged_indices:
+- 0
+- 1
+- 2
+- 4
+- 6
+- 8
+- 9
+- 10
+- 12
+- 14
+- 16
+- 17
+- 18
+- 20
+- 21
+- 22
+- 24
+- 25
+- 26
+- 28
+- 30

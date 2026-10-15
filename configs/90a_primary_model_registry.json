@@ -1,0 +1,944 @@
+{
+  "step": "90a_freeze_primary_models",
+  "date": "2026-03-12 02:21:08",
+  "protocol_version": "v3.1",
+  "database": "MIMIC-IV",
+  "purpose": "Frozen model registry for external validation. All external datasets must use these exact configs + checkpoints.",
+  "training_config": {
+    "path": "configs/80_step_c_training_v1.yaml",
+    "sha256": "55c38c8b25a3e55ced2b8d95e38e83a41615ad0a989266226792ba7845b8a68e",
+    "grid": {
+      "n_bins": 12,
+      "bin_hours": 2,
+      "horizon_hours": 24,
+      "t0_hours": 6
+    },
+    "action": {
+      "scheme": "coarse_3",
+      "n_raw_cells": 18,
+      "n_merged_cells": 13,
+      "encoding": "fluid_level * 6 + vaso_level * 2 + diuretic_level",
+      "valid_merged_indices": [
+        0,
+        1,
+        2,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        16
+      ]
+    },
+    "split": {
+      "train_frac": 0.7,
+      "val_frac": 0.15,
+      "test_frac": 0.15,
+      "stratify_col": "mortality_28d",
+      "seed": 2024
+    },
+    "reward": {
+      "type": "sparse_terminal",
+      "primary_outcome": "mortality_28d",
+      "transform": "R = -1 * mortality_28d",
+      "gamma": 1.0
+    }
+  },
+  "normalization": {
+    "path": "configs/45c_normalization_params_v1.yaml",
+    "sha256": "259f9e8d7f5868b7af2f75dea3b2067a0f07990ee08a639024067369253b79e6",
+    "method": "z-score",
+    "imputation": "LOCF + population_median",
+    "n_active_vars": 22,
+    "active_vars": [
+      "map",
+      "sbp",
+      "dbp",
+      "heart_rate",
+      "spo2",
+      "cvp",
+      "resp_rate",
+      "fio2",
+      "lactate",
+      "creatinine",
+      "bun",
+      "potassium",
+      "sodium",
+      "bicarbonate",
+      "glucose",
+      "ph",
+      "hemoglobin",
+      "wbc",
+      "platelet",
+      "albumin",
+      "bilirubin",
+      "troponin"
+    ],
+    "dropped_vars": [
+      "bnp",
+      "temperature"
+    ],
+    "params": {
+      "map": {
+        "mean": 78.6558760119551,
+        "std": 13.926244225893042,
+        "pop_median": 77.0
+      },
+      "sbp": {
+        "mean": 118.10664314016749,
+        "std": 19.398043015012288,
+        "pop_median": 116.0
+      },
+      "dbp": {
+        "mean": 63.35998429436603,
+        "std": 13.679740462615754,
+        "pop_median": 62.0
+      },
+      "heart_rate": {
+        "mean": 84.16196618998588,
+        "std": 17.326300855833964,
+        "pop_median": 82.5
+      },
+      "spo2": {
+        "mean": 96.5701226570089,
+        "std": 3.0225215123183804,
+        "pop_median": 97.0
+      },
+      "cvp": {
+        "mean": 9.116058389006916,
+        "std": 2.5108773402893143,
+        "pop_median": 9.0
+      },
+      "resp_rate": {
+        "mean": 19.195774667830356,
+        "std": 4.932224805627563,
+        "pop_median": 18.5
+      },
+      "fio2": {
+        "mean": 49.6587953105359,
+        "std": 10.748117130608778,
+        "pop_median": 50.0
+      },
+      "lactate": {
+        "mean": 1.915035017059593,
+        "std": 1.4080980865858965,
+        "pop_median": 1.7
+      },
+      "creatinine": {
+        "mean": 1.1141223288268642,
+        "std": 0.8675079626189802,
+        "pop_median": 0.9
+      },
+      "bun": {
+        "mean": 21.258570414646453,
+        "std": 16.370676383110425,
+        "pop_median": 17.0
+      },
+      "potassium": {
+        "mean": 4.135431257108165,
+        "std": 0.4920315905126606,
+        "pop_median": 4.1
+      },
+      "sodium": {
+        "mean": 138.29144968061362,
+        "std": 4.1605791859635035,
+        "pop_median": 138.0
+      },
+      "bicarbonate": {
+        "mean": 22.91124629092806,
+        "std": 3.512483032967915,
+        "pop_median": 23.0
+      },
+      "glucose": {
+        "mean": 131.7694772595766,
+        "std": 45.37045841274957,
+        "pop_median": 123.0
+      },
+      "ph": {
+        "mean": 7.376147845531583,
+        "std": 0.05114151487360025,
+        "pop_median": 7.38
+      },
+      "hemoglobin": {
+        "mean": 10.62386504536398,
+        "std": 1.6152705368668048,
+        "pop_median": 10.6
+      },
+      "wbc": {
+        "mean": 11.736804746756968,
+        "std": 6.315672501123614,
+        "pop_median": 10.9
+      },
+      "platelet": {
+        "mean": 188.80254696732595,
+        "std": 78.62708464302821,
+        "pop_median": 180.0
+      },
+      "albumin": {
+        "mean": 3.0942147028894427,
+        "std": 0.21441817587069048,
+        "pop_median": 3.1
+      },
+      "bilirubin": {
+        "mean": 1.1088818911777534,
+        "std": 2.266753566270182,
+        "pop_median": 0.8
+      },
+      "troponin": {
+        "mean": 0.2717679980845369,
+        "std": 0.8948911349693537,
+        "pop_median": 0.17
+      }
+    }
+  },
+  "action_space": {
+    "encoding": "fluid_level * 6 + vaso_level * 2 + diuretic_level",
+    "scheme": "coarse_3",
+    "n_raw_cells": 18,
+    "n_merged_cells": 13,
+    "valid_merged_indices": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14,
+      16
+    ],
+    "merge_map": {
+      "3": 2,
+      "5": 4,
+      "11": 10,
+      "15": 14,
+      "17": 16
+    },
+    "merge_map_sha256": "9e9c59516fcc5fc336ba25e13783891cac965edd91aea5422eade4595a2f6b8c"
+  },
+  "rule_policy": {
+    "path": "configs/70c_rule_policy_v1.yaml",
+    "sha256": "68e9b2c88c524d7b07988a71fa10f5cfc5fb720559ed82629cf6c2f4219e129a",
+    "rules": [
+      {
+        "priority": 1,
+        "name": "shock_plus_hypoperfusion",
+        "condition": "MAP < 65 AND lactate > 2.0",
+        "action": "fluid=high, vaso=high, diuretic=none",
+        "action_idx": 16
+      },
+      {
+        "priority": 2,
+        "name": "hypotension_only",
+        "condition": "MAP < 65 AND lactate <= 2.0",
+        "action": "fluid=high, vaso=low, diuretic=none",
+        "action_idx": 14
+      },
+      {
+        "priority": 3,
+        "name": "hypoperfusion_only",
+        "condition": "lactate > 2.0 AND MAP >= 65",
+        "action": "fluid=low_moderate, vaso=low, diuretic=none",
+        "action_idx": 8
+      },
+      {
+        "priority": 4,
+        "name": "volume_overload_hypoxemia",
+        "condition": "fluid_balance > 3.0L AND SpO2 < 94%",
+        "action": "fluid=none, vaso=none, diuretic=any",
+        "action_idx": 1
+      },
+      {
+        "priority": 5,
+        "name": "severe_volume_overload",
+        "condition": "fluid_balance > 5.0L",
+        "action": "fluid=none, vaso=none, diuretic=any",
+        "action_idx": 1
+      },
+      {
+        "priority": 6,
+        "name": "default_maintenance",
+        "condition": "otherwise",
+        "action": "fluid=low_moderate, vaso=none, diuretic=none",
+        "action_idx": 6
+      }
+    ],
+    "thresholds": {
+      "map_hypotension": 65,
+      "lactate_hypoperfusion": 2.0,
+      "fluid_balance_overload_L": 3.0,
+      "fluid_balance_severe_overload_L": 5.0,
+      "spo2_hypoxemia": 94
+    },
+    "normalization_used": {
+      "map": {
+        "mean": 78.6558760119551,
+        "std": 13.926244225893042
+      },
+      "lactate": {
+        "mean": 1.915035017059593,
+        "std": 1.4080980865858965
+      },
+      "spo2": {
+        "mean": 96.5701226570089,
+        "std": 3.0225215123183804
+      }
+    }
+  },
+  "features": {
+    "temporal_cols": [
+      "albumin_freq_24h",
+      "albumin_mask",
+      "albumin_never_measured",
+      "albumin_tsl_h",
+      "albumin_z",
+      "bicarbonate_freq_24h",
+      "bicarbonate_mask",
+      "bicarbonate_never_measured",
+      "bicarbonate_tsl_h",
+      "bicarbonate_z",
+      "bilirubin_freq_24h",
+      "bilirubin_mask",
+      "bilirubin_never_measured",
+      "bilirubin_tsl_h",
+      "bilirubin_z",
+      "bnp_freq_24h",
+      "bnp_mask",
+      "bnp_never_measured",
+      "bnp_tsl_h",
+      "bun_freq_24h",
+      "bun_mask",
+      "bun_never_measured",
+      "bun_tsl_h",
+      "bun_z",
+      "creatinine_freq_24h",
+      "creatinine_mask",
+      "creatinine_never_measured",
+      "creatinine_tsl_h",
+      "creatinine_z",
+      "cvp_freq_24h",
+      "cvp_mask",
+      "cvp_never_measured",
+      "cvp_tsl_h",
+      "cvp_z",
+      "dbp_freq_24h",
+      "dbp_mask",
+      "dbp_never_measured",
+      "dbp_tsl_h",
+      "dbp_z",
+      "fio2_freq_24h",
+      "fio2_mask",
+      "fio2_never_measured",
+      "fio2_tsl_h",
+      "fio2_z",
+      "glucose_freq_24h",
+      "glucose_mask",
+      "glucose_never_measured",
+      "glucose_tsl_h",
+      "glucose_z",
+      "heart_rate_freq_24h",
+      "heart_rate_mask",
+      "heart_rate_never_measured",
+      "heart_rate_tsl_h",
+      "heart_rate_z",
+      "hemoglobin_freq_24h",
+      "hemoglobin_mask",
+      "hemoglobin_never_measured",
+      "hemoglobin_tsl_h",
+      "hemoglobin_z",
+      "lactate_freq_24h",
+      "lactate_mask",
+      "lactate_never_measured",
+      "lactate_tsl_h",
+      "lactate_z",
+      "map_freq_24h",
+      "map_mask",
+      "map_never_measured",
+      "map_tsl_h",
+      "map_z",
+      "ph_freq_24h",
+      "ph_mask",
+      "ph_never_measured",
+      "ph_tsl_h",
+      "ph_z",
+      "platelet_freq_24h",
+      "platelet_mask",
+      "platelet_never_measured",
+      "platelet_tsl_h",
+      "platelet_z",
+      "potassium_freq_24h",
+      "potassium_mask",
+      "potassium_never_measured",
+      "potassium_tsl_h",
+      "potassium_z",
+      "resp_rate_freq_24h",
+      "resp_rate_mask",
+      "resp_rate_never_measured",
+      "resp_rate_tsl_h",
+      "resp_rate_z",
+      "sbp_freq_24h",
+      "sbp_mask",
+      "sbp_never_measured",
+      "sbp_tsl_h",
+      "sbp_z",
+      "sodium_freq_24h",
+      "sodium_mask",
+      "sodium_never_measured",
+      "sodium_tsl_h",
+      "sodium_z",
+      "spo2_freq_24h",
+      "spo2_mask",
+      "spo2_never_measured",
+      "spo2_tsl_h",
+      "spo2_z",
+      "temperature_freq_24h",
+      "temperature_mask",
+      "temperature_never_measured",
+      "temperature_tsl_h",
+      "troponin_freq_24h",
+      "troponin_mask",
+      "troponin_never_measured",
+      "troponin_tsl_h",
+      "troponin_z",
+      "wbc_freq_24h",
+      "wbc_mask",
+      "wbc_never_measured",
+      "wbc_tsl_h",
+      "wbc_z"
+    ],
+    "static_cols": [
+      "age",
+      "hemo_gate_passed",
+      "include_in_phase05"
+    ],
+    "n_temporal": 118,
+    "n_static": 3,
+    "state_tensors_path": "data/interim/45c_state_tensors_v1_mimic.parquet"
+  },
+  "checkpoints": {
+    "80c_gtransformer": {
+      "exists": true,
+      "path": "models/80c_gtransformer_best.pt",
+      "sha256": "063e57c3b896e6316d7c68c0fa40fe8fadd68ab1b41e5b98a5c64a56de596af7",
+      "file_size_mb": 7.41,
+      "best_epoch": 94,
+      "best_val_loss": 60.570241,
+      "embedded_config": true,
+      "n_parameters": 611191,
+      "role": "primary_deep",
+      "ope_methods": [
+        "DM",
+        "DR",
+        "FQE"
+      ],
+      "architecture_config": {
+        "d_model": 128,
+        "n_heads": 4,
+        "n_layers": 4,
+        "d_ff": 256,
+        "dropout": 0.1,
+        "action_embed_dim": 16,
+        "loss_weights": {
+          "next_state": 1.0,
+          "outcome": 1.0
+        },
+        "compute_tier": "G1",
+        "gpu_queue": "gpuh.q",
+        "gpu_resource": "h100=1",
+        "n_gpu": 1,
+        "n_slots": 8
+      },
+      "variants": {
+        "80c_gtransformer_rollout_ow1_best.pt": {
+          "exists": true,
+          "path": "models/80c_gtransformer_rollout_ow1_best.pt",
+          "sha256": "c7ec7997f45d8da760a15066c884f4f0ff8eedf2cfcaba0396bf593f93cae22d",
+          "file_size_mb": 7.41,
+          "best_epoch": 94,
+          "best_val_loss": 60.594422,
+          "embedded_config": true,
+          "n_parameters": 611191
+        }
+      }
+    },
+    "80a_gnet": {
+      "exists": true,
+      "path": "models/80a_gnet_best.pt",
+      "sha256": "30034e333c8caf9a84b70594750fb1325ce237fe51c790e9bf97ddd12954e502",
+      "file_size_mb": 1.05,
+      "best_epoch": 97,
+      "best_val_loss": 76.189836,
+      "n_parameters": 261223,
+      "role": "confirmatory",
+      "ope_methods": [
+        "DM",
+        "DR",
+        "FQE"
+      ],
+      "architecture_config": {
+        "hidden_dim": 128,
+        "n_layers": 2,
+        "dropout": 0.1,
+        "loss_weights": {
+          "next_state": 1.0,
+          "outcome": 1.0
+        },
+        "compute_tier": "G1",
+        "gpu_queue": "gpuh.q",
+        "gpu_resource": "h100=1",
+        "n_gpu": 1,
+        "n_slots": 8
+      },
+      "variants": {}
+    },
+    "80b_actin": {
+      "exists": true,
+      "path": "models/80b_actin_best.pt",
+      "sha256": "7f3eb428cc030f49c8a5d4dbe71bd1d3f726caa84ffe377851dabe37d4d289c0",
+      "file_size_mb": 0.98,
+      "best_epoch": 21,
+      "best_val_loss": 1.985346,
+      "n_parameters": 242750,
+      "role": "confirmatory",
+      "ope_methods": [
+        "DR",
+        "FQE"
+      ],
+      "architecture_config": {
+        "hidden_dim": 128,
+        "n_layers": 2,
+        "balancing_hidden_dim": 64,
+        "balancing_n_layers": 2,
+        "alpha_balancing": 1.0,
+        "dropout": 0.1,
+        "loss_weights": {
+          "outcome": 1.0,
+          "balancing": 1.0
+        },
+        "compute_tier": "G1",
+        "gpu_queue": "gpuh.q",
+        "gpu_resource": "h100=1",
+        "n_gpu": 1,
+        "n_slots": 8
+      },
+      "variants": {}
+    },
+    "80d_ct_legacy": {
+      "exists": true,
+      "path": "models/80d_ct_legacy_best.pt",
+      "sha256": "804dc3bea6f021be0a2ee349ebc7daf96808513fb40928cf79eba271958dc952",
+      "file_size_mb": 0.5,
+      "best_epoch": 39,
+      "best_val_loss": 0.25456,
+      "n_parameters": 119809,
+      "role": "legacy_ablation",
+      "ope_methods": [
+        "FQE"
+      ],
+      "architecture_config": {
+        "d_model": 64,
+        "n_heads": 4,
+        "n_layers": 3,
+        "d_ff": 128,
+        "dropout": 0.1,
+        "compute_tier": "G1",
+        "gpu_queue": "gpuh.q",
+        "gpu_resource": "h100=1",
+        "n_gpu": 1,
+        "n_slots": 8
+      },
+      "variants": {}
+    }
+  },
+  "behavior_policy": {
+    "exists": true,
+    "path": "models/70b_behavior_policy_coarse3.pkl",
+    "sha256": "d3a79de1d7338e08a56cf872215b5105e6e7e5e84d7ee34dbce86620d509346f",
+    "file_size_mb": 0.02,
+    "model_class": "LogisticRegression",
+    "n_classes": 13,
+    "classes": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      14,
+      16
+    ],
+    "C": 1.0,
+    "n_features": 122,
+    "feature_cols": [
+      "albumin_z",
+      "bicarbonate_z",
+      "bilirubin_z",
+      "bun_z",
+      "creatinine_z",
+      "cvp_z",
+      "dbp_z",
+      "fio2_z",
+      "glucose_z",
+      "heart_rate_z",
+      "hemoglobin_z",
+      "lactate_z",
+      "map_z",
+      "ph_z",
+      "platelet_z",
+      "potassium_z",
+      "resp_rate_z",
+      "sbp_z",
+      "sodium_z",
+      "spo2_z",
+      "troponin_z",
+      "wbc_z",
+      "albumin_mask",
+      "bicarbonate_mask",
+      "bilirubin_mask",
+      "bnp_mask",
+      "bun_mask",
+      "creatinine_mask",
+      "cvp_mask",
+      "dbp_mask",
+      "fio2_mask",
+      "glucose_mask",
+      "heart_rate_mask",
+      "hemoglobin_mask",
+      "lactate_mask",
+      "map_mask",
+      "ph_mask",
+      "platelet_mask",
+      "potassium_mask",
+      "resp_rate_mask",
+      "sbp_mask",
+      "sodium_mask",
+      "spo2_mask",
+      "temperature_mask",
+      "troponin_mask",
+      "wbc_mask",
+      "albumin_tsl_h",
+      "bicarbonate_tsl_h",
+      "bilirubin_tsl_h",
+      "bnp_tsl_h",
+      "bun_tsl_h",
+      "creatinine_tsl_h",
+      "cvp_tsl_h",
+      "dbp_tsl_h",
+      "fio2_tsl_h",
+      "glucose_tsl_h",
+      "heart_rate_tsl_h",
+      "hemoglobin_tsl_h",
+      "lactate_tsl_h",
+      "map_tsl_h",
+      "ph_tsl_h",
+      "platelet_tsl_h",
+      "potassium_tsl_h",
+      "resp_rate_tsl_h",
+      "sbp_tsl_h",
+      "sodium_tsl_h",
+      "spo2_tsl_h",
+      "temperature_tsl_h",
+      "troponin_tsl_h",
+      "wbc_tsl_h",
+      "albumin_freq_24h",
+      "bicarbonate_freq_24h",
+      "bilirubin_freq_24h",
+      "bnp_freq_24h",
+      "bun_freq_24h",
+      "creatinine_freq_24h",
+      "cvp_freq_24h",
+      "dbp_freq_24h",
+      "fio2_freq_24h",
+      "glucose_freq_24h",
+      "heart_rate_freq_24h",
+      "hemoglobin_freq_24h",
+      "lactate_freq_24h",
+      "map_freq_24h",
+      "ph_freq_24h",
+      "platelet_freq_24h",
+      "potassium_freq_24h",
+      "resp_rate_freq_24h",
+      "sbp_freq_24h",
+      "sodium_freq_24h",
+      "spo2_freq_24h",
+      "temperature_freq_24h",
+      "troponin_freq_24h",
+      "wbc_freq_24h",
+      "albumin_never_measured",
+      "bicarbonate_never_measured",
+      "bilirubin_never_measured",
+      "bnp_never_measured",
+      "bun_never_measured",
+      "creatinine_never_measured",
+      "cvp_never_measured",
+      "dbp_never_measured",
+      "fio2_never_measured",
+      "glucose_never_measured",
+      "heart_rate_never_measured",
+      "hemoglobin_never_measured",
+      "lactate_never_measured",
+      "map_never_measured",
+      "ph_never_measured",
+      "platelet_never_measured",
+      "potassium_never_measured",
+      "resp_rate_never_measured",
+      "sbp_never_measured",
+      "sodium_never_measured",
+      "spo2_never_measured",
+      "temperature_never_measured",
+      "troponin_never_measured",
+      "wbc_never_measured",
+      "bin_normalized",
+      "age",
+      "hemo_gate_passed",
+      "include_in_phase05"
+    ],
+    "merge_map": {
+      "3": 2,
+      "5": 4,
+      "11": 10,
+      "15": 14,
+      "17": 16
+    }
+  },
+  "ope_config": {
+    "path": "configs/70e_ope_config_v1.yaml",
+    "sha256": "88a6d408c75b1104f8f4ba08fe2ece602edf61695578132df51271935c89c416",
+    "bootstrap": {
+      "n_resamples": 500,
+      "seed": 7777,
+      "ci_method": "percentile",
+      "confidence_level": 0.95
+    },
+    "fqe": {
+      "hidden_dims": [
+        256,
+        128
+      ],
+      "activation": "relu",
+      "training_epochs": 100,
+      "learning_rate": 0.001,
+      "batch_size": 256,
+      "n_iterations": 50,
+      "convergence_tol": 0.0001
+    },
+    "subgroup_stratifiers": [
+      "rule_phenotype_2class",
+      "hf_subtype",
+      "early_data_driven_k2"
+    ],
+    "trimming_brackets": [
+      [
+        1.0,
+        99.0
+      ],
+      [
+        2.5,
+        97.5
+      ],
+      [
+        5.0,
+        95.0
+      ],
+      [
+        10.0,
+        90.0
+      ],
+      [
+        20.0,
+        80.0
+      ]
+    ]
+  },
+  "mimic_reference_results": {
+    "80c_gtransformer": {
+      "policy_values": [
+        {
+          "model": "80c_gtransformer",
+          "estimator": "DM",
+          "v_observed": 0.1357817500829696,
+          "v_rule": 0.1340038776397705,
+          "ate": -0.0017778724431991,
+          "ess": NaN
+        },
+        {
+          "model": "80c_gtransformer",
+          "estimator": "DR",
+          "v_observed": 0.1381668895483017,
+          "v_rule": 0.1315001133643418,
+          "ate": -0.0066667761839598,
+          "ess": 484.4686198301587
+        },
+        {
+          "model": "80c_gtransformer",
+          "estimator": "FQE",
+          "v_observed": 0.1381668946648427,
+          "v_rule": 0.1098587065935134,
+          "ate": -0.0283081880713292,
+          "ess": NaN
+        }
+      ],
+      "bootstrap_ci": [
+        {
+          "model": "80c_gtransformer",
+          "estimator": "DM",
+          "n_success": 500,
+          "ate_mean": -0.0017805588543415,
+          "ate_ci_lo": -0.0020229324698448,
+          "ate_ci_hi": -0.0015332493931055,
+          "v_rule_mean": 0.1337366553544998,
+          "v_rule_ci_lo": 0.1286645654588937,
+          "v_rule_ci_hi": 0.1384005706757307
+        }
+      ],
+      "subgroup": [
+        {
+          "model": "80c_gtransformer",
+          "stratifier": "rule_phenotype_2class",
+          "group": "non_shock",
+          "n_stays": 3732,
+          "v_observed": 0.1045705303549766,
+          "v_rule": 0.1038415059447288,
+          "ate": -0.0007290244102478
+        },
+        {
+          "model": "80c_gtransformer",
+          "stratifier": "rule_phenotype_2class",
+          "group": "shock_predominant",
+          "n_stays": 2116,
+          "v_observed": 0.1908291280269622,
+          "v_rule": 0.1872014105319976,
+          "ate": -0.0036277174949645
+        },
+        {
+          "model": "80c_gtransformer",
+          "stratifier": "early_data_driven_k2",
+          "group": "0",
+          "n_stays": 3322,
+          "v_observed": 0.0973046272993087,
+          "v_rule": 0.0963014811277389,
+          "ate": -0.0010031461715698
+        },
+        {
+          "model": "80c_gtransformer",
+          "stratifier": "early_data_driven_k2",
+          "group": "1",
+          "n_stays": 2526,
+          "v_observed": 0.1863838732242584,
+          "v_rule": 0.1835871785879135,
+          "ate": -0.0027966946363449
+        }
+      ]
+    },
+    "80c_gtransformer_rollout_ow1": {
+      "policy_values": [
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "estimator": "DM",
+          "v_observed": 0.117848239839077,
+          "v_rule": 0.1041370704770088,
+          "ate": -0.0137111693620681,
+          "ess": NaN
+        },
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "estimator": "DR",
+          "v_observed": 0.1381668895483017,
+          "v_rule": 0.1313592713896533,
+          "ate": -0.0068076181586483,
+          "ess": 484.4686198301587
+        },
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "estimator": "FQE",
+          "v_observed": 0.1381668946648427,
+          "v_rule": 0.1017833575606346,
+          "ate": -0.036383537104208,
+          "ess": NaN
+        }
+      ],
+      "bootstrap_ci": [
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "estimator": "DM",
+          "n_success": 500,
+          "ate_mean": -0.0137216065824031,
+          "ate_ci_lo": -0.0149171669036149,
+          "ate_ci_hi": -0.0126181798055768,
+          "v_rule_mean": 0.1038262223750352,
+          "v_rule_ci_lo": 0.099750393629074,
+          "v_rule_ci_hi": 0.1078378461301326
+        }
+      ],
+      "subgroup": [
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "stratifier": "rule_phenotype_2class",
+          "group": "non_shock",
+          "n_stays": 3732,
+          "v_observed": 0.0900962501764297,
+          "v_rule": 0.0836019366979599,
+          "ate": -0.0064943134784698
+        },
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "stratifier": "rule_phenotype_2class",
+          "group": "shock_predominant",
+          "n_stays": 2116,
+          "v_observed": 0.1667945683002472,
+          "v_rule": 0.1403550058603286,
+          "ate": -0.0264395624399185
+        },
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "stratifier": "early_data_driven_k2",
+          "group": "0",
+          "n_stays": 3322,
+          "v_observed": 0.0809339061379432,
+          "v_rule": 0.0729255378246307,
+          "ate": -0.0080083683133125
+        },
+        {
+          "model": "80c_gtransformer_rollout_ow1",
+          "stratifier": "early_data_driven_k2",
+          "group": "1",
+          "n_stays": 2526,
+          "v_observed": 0.1663951128721237,
+          "v_rule": 0.1451840847730636,
+          "ate": -0.02121102809906
+        }
+      ]
+    }
+  },
+  "external_validation_instructions": {
+    "normalization": "Apply MIMIC normalization params to external data. Do NOT re-estimate mean/std from external data. Use params from configs/45c_normalization_params_v1.yaml.",
+    "imputation": "Apply same LOCF + population_median strategy. Use MIMIC population medians from normalization params, NOT external dataset medians.",
+    "action_space": "Use same action encoding (fluid*6 + vaso*2 + diuretic). Apply same merge map. Thresholds for treatment levels must match MIMIC definitions.",
+    "rule_policy": "Apply same rule policy thresholds (MAP<65, lactate>2, etc.) using RAW (un-normalized) clinical values. Normalization info in rule_policy.normalization_used is for converting z-scores back to raw if needed.",
+    "model_loading": "Load MIMIC-trained checkpoints and set model.eval(). Do NOT fine-tune on external data. Temporal/static feature dimensions must match exactly.",
+    "behavior_policy": "Fit a NEW behavior policy on external data (same model class: LogisticRegression, same features). This captures external clinician treatment patterns. MIMIC behavior policy is NOT transported.",
+    "splits": "External data is used as a FULL test set (no train/val split). The models are frozen from MIMIC training.",
+    "ascertainment": "See docs/protocol/29d_external_ef_ascertainment_plan.md for per-database HFpEF ascertainment strategy. See docs/protocol/29e_dataset_role_downgrade_rules.md for sample size and positivity triggers."
+  },
+  "verification": {
+    "models_found": 4,
+    "models_expected": 4,
+    "behavior_policy_found": true,
+    "normalization_found": true,
+    "all_critical_artifacts_present": true,
+    "warnings": []
+  }
+}

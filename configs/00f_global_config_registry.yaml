@@ -1,0 +1,210 @@
+# =============================================================================
+# 00f_global_config_registry.yaml
+# HFpEF ICU DTR — Central project configuration registry
+# Protocol v3.1 | Step 00f
+#
+# Purpose:
+#   Single source of truth for directory layout, dataset entrypoints,
+#   dataset readiness status, study-design constants (time zero, grid,
+#   horizon), locked Step C model hierarchy, and execution priority.
+#
+# Usage:
+#   from hfpef_dtr.config import load_config
+#   cfg = load_config()          # auto-resolves PROJECT_ROOT
+#   cfg.paths.raw               # -> Path("<root>/data/raw")
+#   cfg.datasets.mimic.status   # -> "ready"
+#
+# Notes:
+#   - Machine-specific overrides (actual PROJECT_ROOT, RAW_DATA_ROOT)
+#     come from env/env.paths at runtime; this file stores the
+#     *relative* canonical layout.
+#   - Do NOT put patient data or private credentials here.
+# =============================================================================
+
+project:
+  name: HFpEF_ICU_DTR
+  protocol_version: "v3.1"
+  canonical_protocol: docs/protocol/HFpEF_ICU_DTR_protocol_v3_1_handoff_packet.md
+
+# ---------------------------------------------------------------------------
+# Directory layout (relative to PROJECT_ROOT)
+# ---------------------------------------------------------------------------
+paths:
+  raw: data/raw
+  staging: data/staging
+  interim: data/interim
+  processed: data/processed
+  external: data/external
+  configs: configs
+  src: src
+  scripts: scripts
+  reports: reports
+  figures: figures
+  tables: tables
+  models: models
+  logs: logs
+
+# ---------------------------------------------------------------------------
+# Dataset entrypoints and readiness
+# ---------------------------------------------------------------------------
+datasets:
+  mimic:
+    label: MIMIC-IV
+    role: primary_development
+    entrypoint: data/raw/mimiciv          # symlink target
+    subdirs:
+      hosp: hosp
+      icu: icu
+      note: note/2.2/note      # mimic-iv-note discharge summaries & radiology
+    hfpef_ascertainment: strict           # HF diagnosis + EF >= 50%
+    status: ready
+
+  eicu:
+    label: eICU-CRD
+    role: multicenter_transportability
+    entrypoint: data/raw/eicu/2.0
+    hfpef_ascertainment: broader_compatible  # may use broader HFpEF-compatible def
+    status: ready
+
+  hirid:
+    label: HiRID 1.1.1
+    role: high_frequency_robustness
+    entrypoint: data/raw/hirid/1.1.1
+    hfpef_ascertainment: broader_compatible  # downgrade allowed per protocol
+    status: archive_present_extraction_pending
+    notes: >
+      Observation/pharma/merged/imputed parquet tar archives confirmed present.
+      Extraction path and ingestion-ready directory structure not yet finalized.
+      Do NOT treat as ready-for-ingestion.
+
+# Dataset execution priority (strict order)
+dataset_priority:
+  - mimic
+  - eicu
+  - hirid
+
+# ---------------------------------------------------------------------------
+# Study design constants
+# ---------------------------------------------------------------------------
+study_design:
+  # Time zero (landmark)
+  time_zero:
+    primary_hours: 6           # ICU admission + 6 h
+    sensitivity_hours: 12      # ICU admission + 12 h
+
+  # Decision grid
+  decision_grid:
+    bin_hours: 2               # 2-hour intervals
+    primary_horizon_hours: 24
+    sensitivity_horizons_hours:
+      - 48
+      - 72
+
+  # Primary outcome
+  primary_outcome: 28d_all_cause_mortality
+  secondary_outcomes:
+    - 7d_mortality
+    - intubation_imv_escalation_72h
+    - ventilator_free_days_28d
+    - aki_progression
+    - net_fluid_balance_72h
+    - icu_free_days
+
+  # Cohort philosophy
+  cohort:
+    primary: broad_hfpef
+    fallback: syndrome_matched_hfpef     # if Phase 0.5 triggers
+    pre_t0_gate: hemodynamic_management  # uses only pre-T0 information
+
+  # Positivity trimming grid
+  trimming_grid:
+    - [0.05, 0.95]
+    - [0.10, 0.90]
+    - [0.15, 0.85]
+    - [0.20, 0.80]
+
+# ---------------------------------------------------------------------------
+# Comparator definitions
+# ---------------------------------------------------------------------------
+comparators:
+  description: >
+    Primary comparisons are NOT vs general ICU population.
+    They are phenotype-specific, syndrome-matched comparisons.
+  pairs:
+    - label: HFpEF vs HFrEF/HFmrEF
+      hfpef: strict
+      comparator: hfref_or_hfmref
+    - label: HFpEF vs non-HF (syndrome-matched)
+      hfpef: strict
+      comparator: non_hf_syndrome_matched
+
+# ---------------------------------------------------------------------------
+# Step C model hierarchy (locked)
+# ---------------------------------------------------------------------------
+step_c_models:
+  primary_pair:
+    - id: 75a_dynamic_msm_iptw
+      label: dynamic-MSM / IPTW
+      role: primary_classical
+    - id: 80c_gtransformer
+      label: G-Transformer
+      role: primary_deep
+
+  confirmatory:
+    - id: 80a_gnet
+      label: G-Net
+    - id: 80b_actin
+      label: ACTIN
+
+  legacy_ablation:
+    - id: 80d_ct_legacy
+      label: Causal Transformer
+
+  optional:
+    - id: 80e_mamba_cdsp
+      label: Mamba-CDSP
+
+  sensitivity_evaluation:
+    - id: 85a_edq
+      label: EDQ (timing-sensitive OPE)
+    - id: 85b_seqdeconf
+      label: Sequential Deconfounder (exploratory)
+    - id: 85j_informative_missingness_sensitivity
+      label: Informative Missingness Sensitivity
+
+# ---------------------------------------------------------------------------
+# Execution discipline
+# ---------------------------------------------------------------------------
+execution:
+  mvp_rule: >
+    Full multi-database expansion or full Step C model-stack expansion
+    is NOT allowed until MIMIC-only Phase 0.5 is successful and the
+    modeling dataset is frozen (30f + 45f complete).
+  current_phase: bootstrap
+  last_completed_step: 03h_target_trial_table_v1
+  next_steps:
+    - 01_build_stays_mimic
+    - 02_build_stays_eicu
+
+# ---------------------------------------------------------------------------
+# Occupied step IDs (do NOT reuse)
+# ---------------------------------------------------------------------------
+occupied_step_ids:
+  "00a": scan_data_layout
+  "00b": link_raw_data
+  "00c": peek_key_tables
+  "00d": smoke_test_env
+  "00e": inspect_hirid_archives
+  "00f": global_config_registry
+  "01": build_stays_mimic
+  "03f": sap_skeleton_v1
+  "03g": assumption_to_diagnostic_map_v1
+  "03h": target_trial_table_v1
+
+# ---------------------------------------------------------------------------
+# Random seeds (for reproducibility)
+# ---------------------------------------------------------------------------
+seeds:
+  global: 42
+  split: 2024
+  bootstrap: 7777

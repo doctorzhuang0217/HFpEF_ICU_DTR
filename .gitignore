@@ -1,0 +1,26 @@
+# patient-level data and every derived output stay outside version control
+data/
+reports/
+tables/
+figures/
+models/
+logs/
+*.parquet
+*.feather
+*.pkl
+*.pt
+*.npz
+*.npy
+*.csv
+
+# local configuration
+env/env.paths
+.env
+.env.*
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/

@@ -1,0 +1,103 @@
+# =============================================================================
+# 50a_encoder_baseline_config.yaml
+# HFpEF ICU DTR — Baseline encoder (Step A) hyperparameters
+# Protocol: v3.1 | Step 50a
+# =============================================================================
+
+# ── Model architecture ───────────────────────────────────────────────────────
+model:
+  encoder_type: bigru           # bidirectional GRU
+  hidden_dim: 128               # GRU hidden dimension (per direction)
+  latent_dim: 64                # output z_t dimension
+  n_layers: 2                   # GRU layers
+  dropout: 0.1
+  use_layer_norm: true
+
+  # Static covariate embedding
+  static_embed_dim: 32          # project statics before concat with temporal
+
+  # Reconstruction decoder
+  decoder_hidden_dim: 128
+  decoder_n_layers: 1
+
+# ── Self-supervised pretext tasks ────────────────────────────────────────────
+pretext:
+  # Masked reconstruction (primary)
+  masked_reconstruction:
+    enabled: true
+    mask_ratio: 0.15              # fraction of input features to mask per bin
+    loss_weight: 1.0
+
+  # Next-state prediction (auxiliary)
+  next_state_prediction:
+    enabled: true
+    loss_weight: 0.5              # relative to reconstruction
+    predict_delta: false          # predict x_{t+1} directly, not delta
+
+  # Auxiliary mortality prediction (weakly supervised)
+  mortality_head:
+    enabled: false                # off for initial pretraining; on for fine-tuning probe
+    target: mortality_28d
+    loss_weight: 0.1
+
+# ── Data ─────────────────────────────────────────────────────────────────────
+data:
+  state_tensor_path: data/interim/45c_state_tensors_v1_mimic.parquet
+  outcomes_path: data/interim/45d_outcomes_absorb_v1_mimic.parquet
+  quality_flags_path: data/interim/45e_data_quality_flags_v1_mimic.parquet
+  cohort_path: data/staging/25f_primary_cohort_candidate_v1_mimic.parquet
+
+  # Train/val/test split
+  split_seed: 2024                # matches global config seeds.split
+  train_frac: 0.7
+  val_frac: 0.15
+  test_frac: 0.15
+  stratify_by: mortality_28d     # stratified split
+
+  # Feature groups — assembled in 45c
+  # The script auto-discovers columns by suffix pattern:
+  #   *_zscore: z-scored state vars (model input)
+  #   *_mask, *_tsl_h, *_freq_24h, *_never_measured: missingness features
+  #   static_*: static covariates
+
+  # Absorbing state handling
+  # Bins after absorbing event are masked (not used in reconstruction loss)
+  mask_post_absorbing: true
+
+# ── Training ─────────────────────────────────────────────────────────────────
+training:
+  # Debug run (G1: 1×GPU, ~1h)
+  debug:
+    max_epochs: 5
+    batch_size: 256
+    learning_rate: 1.0e-3
+    gradient_clip: 1.0
+    early_stopping_patience: 3
+    num_workers: 4
+
+  # Full run (G1/G2: 1-2×GPU, ~4-8h)
+  full:
+    max_epochs: 100
+    batch_size: 512
+    learning_rate: 1.0e-3
+    weight_decay: 1.0e-5
+    lr_scheduler: cosine_warmup
+    warmup_epochs: 5
+    gradient_clip: 1.0
+    early_stopping_patience: 15
+    num_workers: 8
+
+  optimizer: adamw
+  mixed_precision: true           # fp16 on A100
+
+# ── Output ───────────────────────────────────────────────────────────────────
+output:
+  checkpoint_dir: models/50a_encoder_baseline
+  best_model_name: encoder_baseline_best.pt
+  last_model_name: encoder_baseline_last.pt
+  training_log: reports/50a_encoder_baseline_training_log.csv
+  summary_report: reports/50a_encoder_baseline_summary.txt
+
+# ── Reproducibility ──────────────────────────────────────────────────────────
+seed: 42                          # matches global config seeds.global
+deterministic: true               # torch.use_deterministic_algorithms (may be slower)

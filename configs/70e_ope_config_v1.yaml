@@ -1,0 +1,96 @@
+step: 70e_define_ope_config
+date: '2026-03-09 02:11:53'
+protocol_version: v3.1
+ope_methods:
+  iptw_wis:
+    name: Weighted Importance Sampling
+    abbreviation: WIS
+    applicable_to:
+    - 75a_dynamic_msm_iptw
+    weight_source: 70b behavior policy propensities
+    normalization: self-normalized (WIS)
+    variance_estimator: bootstrap (B=500)
+    confidence_level: 0.95
+  doubly_robust:
+    name: Doubly-Robust Estimator
+    abbreviation: DR
+    applicable_to:
+    - 75a_dynamic_msm_iptw
+    - 80a_gnet
+    - 80c_gtransformer
+    components:
+      propensity: 70b behavior policy
+      outcome_model: fitted within each Step C method
+    variance_estimator: influence-function + bootstrap
+    confidence_level: 0.95
+  fqe:
+    name: Fitted Q-Evaluation
+    abbreviation: FQE
+    applicable_to:
+    - 80a_gnet
+    - 80b_actin
+    - 80c_gtransformer
+    - 80d_ct_legacy
+    - 80e_mamba_cdsp
+    q_network:
+      architecture: 2-layer MLP (256, 128)
+      activation: ReLU
+      training_epochs: 100
+      learning_rate: 0.001
+      batch_size: 256
+    n_iterations: 50
+    convergence_tol: 0.0001
+  direct_method:
+    name: Direct Method (G-computation)
+    abbreviation: DM
+    applicable_to:
+    - 80a_gnet
+    - 80c_gtransformer
+    description: Outcome model only, no importance weighting. Valid under correct
+      outcome model specification.
+evaluation_protocol:
+  primary_estimand: ATE (28-day mortality)
+  comparison_policies:
+  - name: observed_clinician
+    type: behavior_policy
+    source: 70b propensities
+  - name: rule_policy_v1
+    type: rule_based
+    source: 70c rule policy
+  subgroup_analyses:
+  - stratifier: rule_phenotype_2class
+    groups:
+    - shock_predominant
+    - non_shock
+    note: Primary subgroup analysis
+  - stratifier: hf_subtype
+    groups:
+    - hfpef
+    - hfref
+    - hfmref
+    - no_hf
+    note: HF subtype-specific policy evaluation
+  sensitivity_analyses:
+  - name: phenotype_sensitivity
+    stratifier: early_data_driven_k2
+    note: Repeat with data-driven binary phenotype
+  - name: trimming_sensitivity
+    reference: 70f_trimming_grid_v1.yaml
+  bootstrap:
+    n_resamples: 500
+    seed: 7777
+    ci_method: percentile
+    confidence_level: 0.95
+reporting_requirements:
+  per_method:
+  - point_estimate
+  - ci_lower
+  - ci_upper
+  - n_effective
+  - weight_diagnostics
+  comparison_table: "All methods \xD7 all policies \xD7 all subgroups in a single\
+    \ table"
+  visualization:
+  - forest_plot_by_method
+  - policy_value_comparison
+  - weight_distribution_histogram

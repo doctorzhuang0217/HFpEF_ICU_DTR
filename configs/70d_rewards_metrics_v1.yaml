@@ -1,0 +1,63 @@
+step: 70d_define_rewards_and_metrics
+date: '2026-03-09 02:12:16'
+protocol_version: v3.1
+reward_formulation:
+  type: sparse_terminal
+  description: 'Sparse reward: R_t=0 for non-terminal steps. Terminal reward at absorbing
+    step or end of horizon.'
+  primary:
+    name: neg_mortality_28d
+    column: mortality_28d
+    transform: R = -1 * mortality_28d
+    range:
+    - -1
+    - 0
+    interpretation: 0 = survival, -1 = death at 28 days
+  secondary:
+  - name: neg_mortality_7d
+    column: mortality_7d
+    transform: R = -1 * mortality_7d
+    range:
+    - -1
+    - 0
+  discount_factor: 1.0
+  discount_note: gamma=1.0 because horizon is finite (12 bins = 24h) and reward is
+    terminal-only. No discounting needed.
+absorbing_state_handling:
+  death:
+    terminal: true
+    reward: -1.0
+    post_absorption: no further actions or rewards
+  discharge:
+    terminal: true
+    reward: determined by 28-day outcome (ascertained post-ICU)
+    post_absorption: no further actions
+  end_of_horizon:
+    terminal: true
+    reward: determined by 28-day outcome
+evaluation_metrics:
+  primary:
+    name: weighted_mean_outcome
+    description: Mean potential outcome under evaluated policy, estimated via IPTW
+      or g-computation.
+    estimands:
+    - name: ATE
+      description: 'Average Treatment Effect: E[Y(pi)] - E[Y(pi_obs)]'
+    - name: policy_value
+      description: V(pi) = E[sum_t gamma^t R_t | pi]
+  secondary:
+  - name: mortality_risk_ratio
+    description: 'RR of 28-day mortality: policy vs observed'
+  - name: mortality_risk_difference
+    description: 'RD of 28-day mortality: policy - observed'
+  ope_metrics:
+  - name: WIS
+    description: Weighted Importance Sampling estimator
+  - name: DR
+    description: Doubly-Robust estimator
+  - name: FQE
+    description: Fitted Q-Evaluation (for deep RL policies)
+baseline_rates:
+  mortality_28d: 0.1382
+  mortality_7d: 0.0782
+  n_stays: 38981

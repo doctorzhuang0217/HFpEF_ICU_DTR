@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+title: "Analysis code: a two-hourly, perfusion-first haemodynamic treatment strategy for critically ill patients with heart failure with preserved ejection fraction"
+version: "1.0.0"
+license: MIT
+repository-code: "https://github.com/doctorzhuang0217/HFpEF_ICU_DTR"
+keywords:
+  - heart failure with preserved ejection fraction
+  - intensive care
+  - dynamic treatment regime
+  - target trial emulation
+  - g-computation
+  - MIMIC-IV
+  - eICU-CRD
+authors:
+  - given-names: Yizhou
+    family-names: Zhuang
+  - given-names: Mingwei
+    family-names: Zhang
+  - given-names: Jianhui
+    family-names: Zhao
+  - given-names: Wanzhe
+    family-names: Xu
+  - given-names: Yawen
+    family-names: Zhang
+  - given-names: Jinyu
+    family-names: Wu
+  - given-names: Zhenyu
+    family-names: Xiong
+  - given-names: Zhenhua
+    family-names: Zhang
+  - given-names: Yitao
+    family-names: Yang
+  - given-names: Martin
+    family-names: Loza
+  - given-names: Meixia
+    family-names: Ren
+  - given-names: Kenta
+    family-names: Nakai

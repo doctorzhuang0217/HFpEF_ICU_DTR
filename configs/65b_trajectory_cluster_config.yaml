@@ -1,0 +1,25 @@
+# =============================================================================
+# 65b_trajectory_cluster_config.yaml
+# HFpEF ICU DTR — Trajectory phenotype clustering (Step 65b)
+# Protocol: v3.1 | Step 65b
+# =============================================================================
+
+# ── Track A: K-means / GMM sweep ─────────────────────────────────────────────
+clustering:
+  k_candidates: [2, 3, 4, 5, 6]
+  seed: 2024
+  n_init: 10
+  min_cluster_frac: 0.05          # clusters smaller than 5% are disfavored
+
+# ── Track B: GMVAE (optional, GPU) ──────────────────────────────────────────
+gmvae:
+  n_components: 4                 # number of mixture components
+  hidden_dim: 128                 # GRU hidden dim
+  gmvae_latent_dim: 32            # GMVAE latent space dim
+  max_epochs: 50                  # training epochs
+  batch_size: 256
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-5
+
+# ── Reproducibility ──────────────────────────────────────────────────────────
+seed: 2024

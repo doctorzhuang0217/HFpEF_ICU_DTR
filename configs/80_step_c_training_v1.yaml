@@ -1,0 +1,177 @@
+step: 80_step_c_training_config
+date: '2026-03-09'
+protocol_version: v3.1
+description: Shared training configuration for all Step C deep causal models
+
+# ── Data paths (relative to PROJECT_ROOT) ──────────────────────────────
+data:
+  state_tensors: data/interim/45c_state_tensors_v1_mimic.parquet
+  outcomes: data/interim/45d_outcomes_absorb_v1_mimic.parquet
+  propensities_coarse3: data/interim/70b_propensity_coarse3_v1_mimic.parquet
+  propensities_coarse2: data/interim/70b_propensity_coarse2_v1_mimic.parquet
+  phenotype_labels: data/processed/phenotype_labels_frozen_v1_mimic.parquet
+  action_space: configs/action_space_v1.yaml
+  rule_policy: configs/70c_rule_policy_v1.yaml
+  merge_map: configs/70b_action_merge_map.yaml
+  ope_config: configs/70e_ope_config_v1.yaml
+  trimming_grid: configs/70f_trimming_grid_v1.yaml
+  model_registry: configs/70g_model_registry_v1.yaml
+
+# ── Action space ───────────────────────────────────────────────────────
+action:
+  scheme: coarse_3
+  n_raw_cells: 18
+  n_merged_cells: 13
+  encoding: "fluid_level * 6 + vaso_level * 2 + diuretic_level"
+  # merged action indices actually used (after 70b merge map)
+  valid_merged_indices: [0, 1, 2, 4, 6, 7, 8, 9, 10, 12, 13, 14, 16]
+
+# ── Temporal grid ──────────────────────────────────────────────────────
+grid:
+  n_bins: 12
+  bin_hours: 2
+  horizon_hours: 24
+  t0_hours: 6
+
+# ── Train / val / test split ───────────────────────────────────────────
+split:
+  train_frac: 0.70
+  val_frac: 0.15
+  test_frac: 0.15
+  stratify_col: mortality_28d
+  seed: 2024
+
+# ── Reward formulation ─────────────────────────────────────────────────
+reward:
+  type: sparse_terminal
+  primary_outcome: mortality_28d
+  transform: "R = -1 * mortality_28d"
+  gamma: 1.0
+
+# ── Training defaults (overridable per model) ──────────────────────────
+training:
+  max_epochs: 100
+  early_stopping:
+    patience: 10
+    monitor: val_loss
+    mode: min
+  batch_size: 128
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-5
+  optimizer: adamw
+  scheduler:
+    type: cosine
+    warmup_epochs: 10
+  gradient_clip: 1.0
+  num_workers: 4
+  pin_memory: true
+  seed: 42
+
+# ── Model-specific overrides ──────────────────────────────────────────
+models:
+  80c_gtransformer:
+    d_model: 128
+    n_heads: 4
+    n_layers: 4
+    d_ff: 256
+    dropout: 0.1
+    action_embed_dim: 16
+    loss_weights:
+      next_state: 1.0
+      outcome: 1.0
+    compute_tier: G1
+    gpu_queue: gpuh.q
+    gpu_resource: "h100=1"
+    n_gpu: 1
+    n_slots: 8
+
+  80a_gnet:
+    hidden_dim: 128
+    n_layers: 2
+    dropout: 0.1
+    loss_weights:
+      next_state: 1.0
+      outcome: 1.0
+    compute_tier: G1
+    gpu_queue: gpuh.q
+    gpu_resource: "h100=1"
+    n_gpu: 1
+    n_slots: 8
+
+  80b_actin:
+    hidden_dim: 128
+    n_layers: 2
+    balancing_hidden_dim: 64
+    balancing_n_layers: 2
+    alpha_balancing: 1.0
+    dropout: 0.1
+    loss_weights:
+      outcome: 1.0
+      balancing: 1.0
+    compute_tier: G1
+    gpu_queue: gpuh.q
+    gpu_resource: "h100=1"
+    n_gpu: 1
+    n_slots: 8
+
+  80d_ct_legacy:
+    d_model: 64
+    n_heads: 4
+    n_layers: 3
+    d_ff: 128
+    dropout: 0.1
+    compute_tier: G1
+    gpu_queue: gpuh.q
+    gpu_resource: "h100=1"
+    n_gpu: 1
+    n_slots: 8
+
+  80e_mamba_cdsp:
+    d_model: 128
+    d_state: 64
+    n_layers: 4
+    dropout: 0.1
+    compute_tier: G1
+    gpu_queue: gpuh.q
+    gpu_resource: "h100=1"
+    n_gpu: 1
+    n_slots: 8
+
+# ── OPE evaluation ────────────────────────────────────────────────────
+ope:
+  methods_by_model:
+    80c_gtransformer: [DR, FQE, DM]
+    80a_gnet: [DM, DR, FQE]
+    80b_actin: [DR, FQE]
+    80d_ct_legacy: [FQE]
+    80e_mamba_cdsp: [FQE]
+  fqe:
+    hidden_dims: [256, 128]
+    activation: relu
+    training_epochs: 100
+    learning_rate: 0.001
+    batch_size: 256
+    n_iterations: 50
+    convergence_tol: 0.0001
+  bootstrap:
+    n_resamples: 500
+    seed: 7777
+    ci_method: percentile
+    confidence_level: 0.95
+  subgroup_stratifiers:
+    - rule_phenotype_2class
+    - hf_subtype
+    - early_data_driven_k2
+  trimming_brackets:
+    - [1.0, 99.0]
+    - [2.5, 97.5]
+    - [5.0, 95.0]
+    - [10.0, 90.0]
+    - [20.0, 80.0]
+
+# ── Output paths ──────────────────────────────────────────────────────
+output:
+  checkpoints: models/
+  tables: tables/
+  figures: figures/
+  reports: reports/

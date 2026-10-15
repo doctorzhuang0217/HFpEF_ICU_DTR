@@ -1,0 +1,137 @@
+step: 29a_candidate_action_schemes
+date: '2026-03-08'
+protocol_version: v3.1
+ne_equivalent_factors:
+  norepinephrine: 1.0
+  epinephrine: 1.0
+  phenylephrine: 0.1
+  dopamine: 0.01
+  vasopressin: 2.5
+  dobutamine: 0.0
+  milrinone: 0.0
+furo_equivalent_factors:
+  furosemide: 1.0
+  bumetanide: 40.0
+  torsemide: 2.0
+grid:
+  bin_hours: 2
+  primary_horizon_hours: 24
+  n_bins: 12
+  t0_hours: 6
+schemes:
+  coarse_3:
+    description: Minimal granularity for maximum support; 3×3×2 = 18 joint cells
+    iv_fluid_ml_per_2h:
+      bins:
+      - 0
+      - 1
+      - 250
+      - inf
+      labels:
+      - none
+      - low_moderate
+      - high
+      note: 0=none, >0 to <250=low/moderate, >=250=high (bolus-range)
+    vasopressor_ne_eq_mcg_kg_min:
+      bins:
+      - 0
+      - 0.001
+      - 0.1
+      - inf
+      labels:
+      - none
+      - low
+      - high
+      note: 0=none, >0 to <0.1=low, >=0.1=high
+    diuretic_furo_eq_mg_per_2h:
+      bins:
+      - 0
+      - 0.001
+      - inf
+      labels:
+      - none
+      - any
+      note: 'Binary: none vs any exposure'
+    joint_cells: 18
+  medium_4:
+    description: Moderate granularity balancing interpretability and support; 4×4×2
+      = 32 joint cells
+    iv_fluid_ml_per_2h:
+      bins:
+      - 0
+      - 1
+      - 100
+      - 500
+      - inf
+      labels:
+      - none
+      - minimal
+      - moderate
+      - aggressive
+      note: 0=none, 1-99=minimal/maintenance, 100-499=moderate, >=500=aggressive
+    vasopressor_ne_eq_mcg_kg_min:
+      bins:
+      - 0
+      - 0.001
+      - 0.05
+      - 0.2
+      - inf
+      labels:
+      - none
+      - low
+      - moderate
+      - high
+      note: 0=none, >0 to <0.05=low, 0.05-0.2=moderate, >0.2=high
+    diuretic_furo_eq_mg_per_2h:
+      bins:
+      - 0
+      - 0.001
+      - inf
+      labels:
+      - none
+      - any
+      note: 'Binary: none vs any. 2-bin for Phase 0.5 stability.'
+    joint_cells: 32
+  fine_5:
+    description: Maximum clinical interpretability; 5×4×3 = 60 joint cells — may have
+      support issues
+    iv_fluid_ml_per_2h:
+      bins:
+      - 0
+      - 1
+      - 50
+      - 250
+      - 1000
+      - inf
+      labels:
+      - none
+      - kvo
+      - low
+      - moderate_bolus
+      - high_resuscitation
+      note: 0=none, 1-49=KVO/maintenance, 50-249=low, 250-999=moderate bolus, >=1000=resuscitation
+    vasopressor_ne_eq_mcg_kg_min:
+      bins:
+      - 0
+      - 0.001
+      - 0.05
+      - 0.2
+      - inf
+      labels:
+      - none
+      - low
+      - moderate
+      - high
+      note: Same as medium — 4 pressor bins is clinically standard
+    diuretic_furo_eq_mg_per_2h:
+      bins:
+      - 0
+      - 0.001
+      - 40
+      - inf
+      labels:
+      - none
+      - low
+      - high
+      note: 0=none, >0 to <40mg=low (<=1 standard dose), >=40mg=high
+    joint_cells: 60

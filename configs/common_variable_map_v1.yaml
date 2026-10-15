@@ -1,0 +1,530 @@
+# ──────────────────────────────────────────────────────────────────────
+# common_variable_map_v1.yaml
+# HFpEF ICU DTR — Cross-database common variable map for modeling
+# Protocol: v3.1, Step 40a
+# Generated: 2026-03-08
+# ──────────────────────────────────────────────────────────────────────
+#
+# Each variable entry specifies:
+#   role: static | state | action | outcome | missingness | context
+#   domain: hemodynamics | perfusion | renal | respiratory | metabolic |
+#           treatment_history | acuity_context | missingness | static_covariate |
+#           goals_of_care | rescue
+#   unit: canonical unit after harmonization
+#   grid_agg: aggregation method for 2h grid (mean, max, min, sum, last, first, any)
+#   source_steps: pipeline steps that produce this variable
+#   mimic: column name in MIMIC-IV pipeline
+#   eicu: column name in eICU pipeline (null = not yet mapped)
+#   hirid: column name in HiRID pipeline (null = not yet mapped)
+#   valid_range: [lower, upper] physiologic bounds for QC
+#   notes: free text
+# ──────────────────────────────────────────────────────────────────────
+
+version: v1
+protocol: v3.1
+date_frozen: '2026-03-08'
+grid_bin_hours: 2
+primary_horizon_hours: 24
+t0_hours: 6
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# STATIC COVARIATES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+static_covariates:
+  age:
+    role: static
+    domain: static_covariate
+    unit: years
+    source_steps: [01, 10a]
+    mimic: age
+    eicu: age
+    hirid: null
+    valid_range: [18, 120]
+
+  sex:
+    role: static
+    domain: static_covariate
+    unit: category
+    categories: [M, F]
+    source_steps: [01, 10a]
+    mimic: gender
+    eicu: gender
+    hirid: null
+
+  weight_kg:
+    role: static
+    domain: static_covariate
+    unit: kg
+    source_steps: [10a, 40g]
+    mimic: weight_admit
+    eicu: admissionweight
+    hirid: null
+    valid_range: [30, 300]
+    notes: "Used for mL/kg and mcg/kg/min normalization; imputation flags in 40g"
+
+  height_cm:
+    role: static
+    domain: static_covariate
+    unit: cm
+    source_steps: [10a]
+    mimic: height
+    eicu: admissionheight
+    hirid: null
+    valid_range: [100, 250]
+
+  bmi:
+    role: static
+    domain: static_covariate
+    unit: kg/m2
+    source_steps: [10a]
+    mimic: bmi
+    eicu: null
+    hirid: null
+    valid_range: [12, 80]
+    notes: "Derived from weight/height; may require imputation"
+
+  hfpef_ascertainment:
+    role: static
+    domain: static_covariate
+    unit: category
+    categories: [strict_echo, diastolic_icd_proxy, broad_compatible]
+    source_steps: [20a, 20b, 20c]
+    mimic: hf_subtype
+    eicu: null
+    hirid: null
+    notes: "MIMIC=strict (HF dx + EF>=50%); eICU/HiRID=broader compatible"
+
+  ef_value:
+    role: static
+    domain: static_covariate
+    unit: "%"
+    source_steps: [20a]
+    mimic: ef_value
+    eicu: null
+    hirid: null
+    valid_range: [5, 90]
+
+  comorbidity_burden:
+    role: static
+    domain: static_covariate
+    unit: score
+    source_steps: [10b]
+    mimic: charlson_score
+    eicu: null
+    hirid: null
+    notes: "Charlson comorbidity index; Elixhauser as sensitivity"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# STATE VARIABLES (time-varying, 2h grid)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+state_variables:
+
+  # ── Hemodynamics ──────────────────────────────────────────────
+  map:
+    role: state
+    domain: hemodynamics
+    unit: mmHg
+    grid_agg: mean
+    source_steps: [10d, 15a]
+    mimic: map
+    eicu: systemicmean
+    hirid: null
+    valid_range: [20, 200]
+
+  sbp:
+    role: state
+    domain: hemodynamics
+    unit: mmHg
+    grid_agg: mean
+    source_steps: [10d, 15a]
+    mimic: sbp
+    eicu: systemicsystolic
+    hirid: null
+    valid_range: [40, 300]
+
+  dbp:
+    role: state
+    domain: hemodynamics
+    unit: mmHg
+    grid_agg: mean
+    source_steps: [10d, 15a]
+    mimic: dbp
+    eicu: systemicdiastolic
+    hirid: null
+    valid_range: [20, 200]
+
+  heart_rate:
+    role: state
+    domain: hemodynamics
+    unit: bpm
+    grid_agg: mean
+    source_steps: [10d, 15a]
+    mimic: heart_rate
+    eicu: heartrate
+    hirid: null
+    valid_range: [20, 250]
+
+  spo2:
+    role: state
+    domain: hemodynamics
+    unit: "%"
+    grid_agg: mean
+    source_steps: [10d, 15a]
+    mimic: spo2
+    eicu: sao2
+    hirid: null
+    valid_range: [50, 100]
+
+  cvp:
+    role: state
+    domain: hemodynamics
+    unit: mmHg
+    grid_agg: mean
+    source_steps: [10d, 15a]
+    mimic: cvp
+    eicu: cvp
+    hirid: null
+    valid_range: [-5, 40]
+    notes: "Frequently missing; never-measured flag important"
+
+  # ── Perfusion ─────────────────────────────────────────────────
+  lactate:
+    role: state
+    domain: perfusion
+    unit: mmol/L
+    grid_agg: max
+    source_steps: [10e, 15a]
+    mimic: lactate
+    eicu: lactate
+    hirid: null
+    valid_range: [0.1, 30]
+
+  scvo2:
+    role: state
+    domain: perfusion
+    unit: "%"
+    grid_agg: mean
+    source_steps: [10e, 15a]
+    mimic: scvo2
+    eicu: null
+    hirid: null
+    valid_range: [20, 100]
+    notes: "Very sparse; often never-measured"
+
+  # ── Renal ─────────────────────────────────────────────────────
+  creatinine:
+    role: state
+    domain: renal
+    unit: mg/dL
+    grid_agg: max
+    source_steps: [10e, 15a]
+    mimic: creatinine
+    eicu: creatinine
+    hirid: null
+    valid_range: [0.1, 25]
+
+  bun:
+    role: state
+    domain: renal
+    unit: mg/dL
+    grid_agg: max
+    source_steps: [10e, 15a]
+    mimic: bun
+    eicu: bun
+    hirid: null
+    valid_range: [1, 200]
+
+  urine_output_ml:
+    role: state
+    domain: renal
+    unit: mL
+    grid_agg: sum
+    source_steps: [10g, 15a]
+    mimic: urineoutput
+    eicu: urineoutput
+    hirid: null
+    valid_range: [0, 5000]
+    notes: "Sum within 2h bin; used for fluid balance"
+
+  fluid_balance_ml:
+    role: state
+    domain: renal
+    unit: mL
+    grid_agg: sum
+    source_steps: [10g, 40d]
+    mimic: fluid_balance_ml
+    eicu: null
+    hirid: null
+    valid_range: [-5000, 10000]
+    notes: "Cumulative or per-bin; requires careful sign convention QC (40d)"
+
+  # ── Respiratory ───────────────────────────────────────────────
+  resp_rate:
+    role: state
+    domain: respiratory
+    unit: /min
+    grid_agg: mean
+    source_steps: [10d, 15a]
+    mimic: resp_rate
+    eicu: respiratoryrate
+    hirid: null
+    valid_range: [4, 60]
+
+  fio2:
+    role: state
+    domain: respiratory
+    unit: fraction
+    grid_agg: max
+    source_steps: [10d, 10h]
+    mimic: fio2
+    eicu: fio2
+    hirid: null
+    valid_range: [0.21, 1.0]
+    notes: "Normalize to fraction [0-1]; some sources use percentage"
+
+  pf_ratio:
+    role: state
+    domain: respiratory
+    unit: mmHg
+    grid_agg: min
+    source_steps: [10e, 10h]
+    mimic: pf_ratio
+    eicu: null
+    hirid: null
+    valid_range: [20, 700]
+    notes: "PaO2/FiO2; requires concurrent ABG + FiO2"
+
+  vent_mode:
+    role: state
+    domain: respiratory
+    unit: category
+    categories: [none, nasal_cannula, high_flow, niv, imv]
+    grid_agg: last
+    source_steps: [10h]
+    mimic: vent_mode
+    eicu: null
+    hirid: null
+
+  # ── Metabolic ─────────────────────────────────────────────────
+  ph:
+    role: state
+    domain: metabolic
+    unit: pH
+    grid_agg: min
+    source_steps: [10e, 15a]
+    mimic: ph
+    eicu: ph
+    hirid: null
+    valid_range: [6.8, 7.8]
+
+  bicarbonate:
+    role: state
+    domain: metabolic
+    unit: mEq/L
+    grid_agg: min
+    source_steps: [10e, 15a]
+    mimic: bicarbonate
+    eicu: bicarbonate
+    hirid: null
+    valid_range: [5, 50]
+
+  potassium:
+    role: state
+    domain: metabolic
+    unit: mEq/L
+    grid_agg: last
+    source_steps: [10e, 15a]
+    mimic: potassium
+    eicu: potassium
+    hirid: null
+    valid_range: [1.5, 9]
+
+  sodium:
+    role: state
+    domain: metabolic
+    unit: mEq/L
+    grid_agg: last
+    source_steps: [10e, 15a]
+    mimic: sodium
+    eicu: sodium
+    hirid: null
+    valid_range: [110, 170]
+
+  glucose:
+    role: state
+    domain: metabolic
+    unit: mg/dL
+    grid_agg: mean
+    source_steps: [10e, 15a]
+    mimic: glucose
+    eicu: glucose
+    hirid: null
+    valid_range: [20, 1000]
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ACTION VARIABLES (treatment decisions, 2h grid)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+action_variables:
+
+  iv_fluid_ml:
+    role: action
+    domain: treatment_history
+    unit: mL
+    grid_agg: sum
+    source_steps: [10f, 40d]
+    mimic: iv_fluid_ml
+    eicu: null
+    hirid: null
+    valid_range: [0, 10000]
+    discretization_config: configs/29a_candidate_action_schemes.yaml
+    notes: "Total IV fluid volume per 2h bin"
+
+  vasopressor_ne_eq:
+    role: action
+    domain: treatment_history
+    unit: mcg/kg/min
+    grid_agg: mean
+    source_steps: [10f, 40e]
+    mimic: vasopressor_ne_eq_mcg_kg_min
+    eicu: null
+    hirid: null
+    valid_range: [0, 5]
+    discretization_config: configs/29a_candidate_action_schemes.yaml
+    equivalence_config: configs/29a_candidate_action_schemes.yaml
+
+  diuretic_furo_eq:
+    role: action
+    domain: treatment_history
+    unit: mg
+    grid_agg: sum
+    source_steps: [10f, 40f]
+    mimic: diuretic_furo_eq_mg
+    eicu: null
+    hirid: null
+    valid_range: [0, 500]
+    discretization_config: configs/29a_candidate_action_schemes.yaml
+    equivalence_config: configs/29a_candidate_action_schemes.yaml
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# OUTCOME VARIABLES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+outcome_variables:
+
+  mortality_28d:
+    role: outcome
+    domain: outcome
+    unit: binary
+    source_steps: [10a]
+    mimic: hospital_mortality
+    eicu: null
+    hirid: null
+    notes: "Primary outcome. 28-day all-cause mortality from T0."
+
+  mortality_7d:
+    role: outcome
+    domain: outcome
+    unit: binary
+    source_steps: [10a]
+    mimic: null
+    eicu: null
+    hirid: null
+    notes: "Secondary. Derived from dod - T0."
+
+  intubation_72h:
+    role: outcome
+    domain: outcome
+    unit: binary
+    source_steps: [10h]
+    mimic: null
+    eicu: null
+    hirid: null
+    notes: "Secondary. IMV escalation within 72h of T0."
+
+  vent_free_days_28:
+    role: outcome
+    domain: outcome
+    unit: days
+    source_steps: [10h]
+    mimic: null
+    eicu: null
+    hirid: null
+    valid_range: [0, 28]
+
+  aki_progression:
+    role: outcome
+    domain: outcome
+    unit: binary
+    source_steps: [10e, 10g]
+    mimic: null
+    eicu: null
+    hirid: null
+    notes: "KDIGO stage increase from T0 baseline."
+
+  net_fluid_balance_72h:
+    role: outcome
+    domain: outcome
+    unit: mL
+    source_steps: [10g, 40d]
+    mimic: null
+    eicu: null
+    hirid: null
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CONTEXT VARIABLES (time-invariant within stay, but not model covariates)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+context_variables:
+
+  reason_for_icu:
+    role: context
+    domain: acuity_context
+    unit: category
+    categories: [sepsis, post_op, respiratory, aki, other]
+    source_steps: [25c]
+    mimic: reason_for_icu
+    eicu: null
+    hirid: null
+
+  dominant_syndrome:
+    role: context
+    domain: acuity_context
+    unit: category
+    categories: [shock, congestion, mixed, neither]
+    source_steps: [25d]
+    mimic: dominant_syndrome
+    eicu: null
+    hirid: null
+
+  dnr_dni_status:
+    role: context
+    domain: goals_of_care
+    unit: binary
+    source_steps: [25e]
+    mimic: has_dnr_dni
+    eicu: null
+    hirid: null
+
+  rrt_status:
+    role: context
+    domain: rescue
+    unit: binary
+    source_steps: [25e, 10h]
+    mimic: has_rrt
+    eicu: null
+    hirid: null
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MISSINGNESS FEATURE TEMPLATES (generated by 40c)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+missingness_features:
+  templates:
+    - suffix: _mask
+      description: "1 if value observed in this 2h bin, 0 otherwise"
+    - suffix: _time_since_last_h
+      description: "Hours since last observation (0 if observed in current bin)"
+    - suffix: _freq_24h
+      description: "Count of observations in trailing 24h window"
+    - suffix: _never_measured
+      description: "1 if variable was never measured for this stay (static flag)"
+  apply_to:
+    - all state_variables with role=state
+    - cvp, scvo2, pf_ratio have high never-measured rates

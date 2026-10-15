@@ -1,0 +1,75 @@
+step: 70f_define_trimming_support_grid
+date: '2026-03-09 10:33:58'
+protocol_version: v3.1
+propensity_clipping:
+  method: hard_floor
+  floor: 0.005
+  description: Clip P(A|H) >= 0.005 before computing IPTW weights
+weight_trimming_grid:
+  method: percentile_based
+  primary:
+    lo: 5
+    hi: 95
+  sensitivity:
+  - lo: 1
+    hi: 99
+  - lo: 2.5
+    hi: 97.5
+  - lo: 5
+    hi: 95
+  - lo: 10
+    hi: 90
+  - lo: 20
+    hi: 80
+  results:
+  - percentile_lo: 1
+    percentile_hi: 99
+    weight_lo: 1.0
+    weight_hi: 152.0482
+    n_trimmed: 9348
+    pct_trimmed: 2.0
+    ess_after_trim: 72493.8
+  - percentile_lo: 2.5
+    percentile_hi: 97.5
+    weight_lo: 1.0001
+    weight_hi: 65.6138
+    n_trimmed: 23387
+    pct_trimmed: 5.0
+    ess_after_trim: 119868.9
+  - percentile_lo: 5
+    percentile_hi: 95
+    weight_lo: 1.002
+    weight_hi: 32.4896
+    n_trimmed: 46778
+    pct_trimmed: 10.0
+    ess_after_trim: 177999.2
+  - percentile_lo: 10
+    percentile_hi: 90
+    weight_lo: 1.0506
+    weight_hi: 15.4476
+    n_trimmed: 93556
+    pct_trimmed: 20.0
+    ess_after_trim: 256219.2
+  - percentile_lo: 20
+    percentile_hi: 80
+    weight_lo: 1.5162
+    weight_hi: 7.7477
+    n_trimmed: 187109
+    pct_trimmed: 40.0
+    ess_after_trim: 339802.8
+ess_monitoring:
+  threshold: 25
+  n_flagged: 0
+  n_total: 65
+  coarser_granularity_triggered: false
+  trigger_rule: "45g Rule 2: >3 cell\xD7stratum combos with ESS<25"
+positivity_support:
+  minimum_cell_frequency: 0.001
+  auto_merge_threshold: 0.001
+  merge_map_reference: configs/70b_action_merge_map.yaml
+coarse2_activation:
+  hfpef_sparse_coverage: 0.308
+  threshold: 0.15
+  activated: true
+  note: HFpEF arm has 30.8% stays with sparse-action exposure, exceeding 15% threshold.
+    coarse_2 (9-cell) activated as mandatory sensitivity for HFpEF-specific estimates.
