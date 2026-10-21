@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this code, please cite it as below."
-title: "Analysis code: a two-hourly, perfusion-first haemodynamic treatment strategy for critically ill patients with heart failure with preserved ejection fraction"
-version: "1.0.0"
+title: "Analysis code: a perfusion-first haemodynamic treatment rule for critically ill patients with heart failure with preserved ejection fraction"
+version: "1.0.1"
 license: MIT
 repository-code: "https://github.com/doctorzhuang0217/HFpEF_ICU_DTR"
 keywords:
